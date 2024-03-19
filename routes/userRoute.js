@@ -96,6 +96,9 @@ usersRouter.delete("/:id", async (req, res) => {
     return res.status(500).send({ message: error.message });
   }
 });
+
+//Clerk webhook
+//I encountered an issue with the clerk webhook but what helped was to use JSON.stringify on the req.body and to add my current ip address to mongodb
 usersRouter.post(
   "/api/webhooks/user",
   bodyParser.raw({ type: "application/json" }),

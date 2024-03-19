@@ -35,7 +35,7 @@ app.use(
 app.use("/users", usersRouter);
 //Connect to MongoDB
 mongoose
-  .connect(MONGODB_URI)
+  .connect(MONGODB_URI, { dbName: "snapGram" })
   .then(() => {
     console.log("App connected to mongodb");
     app.listen(4000, () => {
