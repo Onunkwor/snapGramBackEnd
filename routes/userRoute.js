@@ -93,7 +93,7 @@ usersRouter.delete("/:id", async (req, res) => {
   }
 });
 usersRouter.post(
-  "api/webhooks/user",
+  "/api/webhooks/user",
   bodyParser.raw({ type: "application/json" }),
   async function (req, res) {
     // Check if the 'Signing Secret' from the Clerk Dashboard was correctly provided
