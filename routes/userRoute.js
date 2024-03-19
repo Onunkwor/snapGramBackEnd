@@ -3,6 +3,7 @@ import { User } from "../models/userModel.js";
 import { Webhook } from "svix";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
+import { clerkClient } from "@clerk/clerk-sdk-node";
 dotenv.config();
 const usersRouter = express.Router();
 //Save User To Database
@@ -169,13 +170,13 @@ usersRouter.post(
 
       const newUser = await User.create(user);
 
-      // if (newUser) {
-      //   await clerkClient.users.updateUserMetadata(id, {
-      //     publicMetadata: {
-      //       userId: newUser._id,
-      //     },
-      //   });
-      // }
+      if (newUser) {
+        await clerkClient.users.updateUserMetadata(id, {
+          publicMetadata: {
+            userId: newUser._id,
+          },
+        });
+      }
 
       return res.json({ message: "OK", user: newUser });
     }
