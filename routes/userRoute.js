@@ -179,6 +179,7 @@ usersRouter.post(
             userId: newUser._id,
           },
         });
+        res.status(200).json({ success: true });
       }
 
       return res.json({ message: "OK", user: newUser });
