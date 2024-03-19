@@ -8,15 +8,18 @@ const usersRouter = express.Router();
 //Save User To Database
 usersRouter.post("/", async (req, res) => {
   try {
-    if (!req.body.username || !req.body.email || !req.body.name) {
+    if (!req.body.firstName || !req.body.username || !req.body.photo) {
       return res.status(400).send({
         message: "Send all required fields: name, username, email",
       });
     }
     const newUser = {
-      name: req.body.name,
+      clerkId: req.body.clerkId,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
       username: req.body.username,
       email: req.body.email,
+      photo: req.body.photo,
     };
     const user = await User.create(newUser);
     return res.status(201).send(user);
@@ -101,10 +104,10 @@ usersRouter.post(
     if (!WEBHOOK_SECRET) {
       throw new Error("You need a WEBHOOK_SECRET in your .env");
     }
-
+    console.log(WEBHOOK_SECRET);
     // Grab the headers and body
     const headers = req.headers;
-    const payload = req.body;
+    const payload = req.body.toString();
 
     // Get the Svix headers for verification
     const svix_id = headers["svix-id"];
