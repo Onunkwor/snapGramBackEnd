@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 });
 
 //Middleware for parsing request body
-// app.use(express.json());
+app.use(express.json());
 
 //Middleware for handling cors policy
 //Option 1: Allow all origins with default oof cors(*)
