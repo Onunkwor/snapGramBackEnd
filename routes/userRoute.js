@@ -2,7 +2,7 @@ import express from "express";
 import { User } from "../models/userModel.js";
 import { Webhook } from "svix";
 import dotenv from "dotenv";
-
+import bodyParser from "body-parser";
 dotenv.config();
 const usersRouter = express.Router();
 //Save User To Database
