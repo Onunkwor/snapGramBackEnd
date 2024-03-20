@@ -12,6 +12,10 @@ console.log(MONGODB_URI);
 //Initialize app
 const app = express();
 
+app.listen(4000, () => {
+  console.log("Welcome to mern stack");
+});
+
 app.get("/", (req, res) => {
   console.log(req);
   return res.status(200).send("Welcome to mern stack");
@@ -38,9 +42,6 @@ mongoose
   .connect(MONGODB_URI, { dbName: "snapGram" })
   .then(() => {
     console.log("App connected to mongodb");
-    app.listen(4000, () => {
-      console.log(MONGODB_URI);
-    });
   })
   .catch((err) => {
     console.log("Error connecting to mongodb: ", err);
