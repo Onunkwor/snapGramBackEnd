@@ -181,7 +181,28 @@ usersRouter.post(
         });
         return res.status(200).json({ success: true, message: "OK" });
       }
-      //I experienced an issue where i sent to responses to the clerkwebhook causing an error and making the User.create to run twice make to instances of the same user in the the mongodb database
+      //I experienced an issue where i sent to responses to the clerkwebhook causing an error and making the User.create to run twice make to instances of the same user in the the mongodb database that is also cause i didn't return the first response
+    }
+
+    if (eventType === "user.updated") {
+      const { id, image_url, first_name, last_name, username } = evt.data;
+
+      const user = {
+        firstName: first_name,
+        lastName: last_name,
+        username: username,
+        photo: image_url,
+      };
+
+      const updatedUser = await User.findOneAndUpdate(id, user, { new: true });
+      return res.status(200).json({ message: "OK", user: updatedUser });
+    }
+    if (eventType === "user.deleted") {
+      const { id } = evt.data;
+
+      const userToDelete = await User.findOne(id);
+      const deleteUser = await User.findOneAndDelete(userToDelete._id);
+      return res.status(200).json({ message: "OK" });
     }
   }
 );
