@@ -32,8 +32,9 @@ usersRouter.post("/", async (req, res) => {
 
 //Get all Users from Database
 usersRouter.get("/", async (req, res) => {
+  const { limit } = req.body;
   try {
-    const users = await User.find({});
+    const users = await User.find({}).limit(limit);
     return res.status(200).send(users);
   } catch (error) {
     console.log("Error getting users", error);
@@ -162,6 +163,20 @@ usersRouter.post(
         username,
       } = evt.data;
 
+      // Check if a user with the same email already exists
+      const userAlreadyExist = await User.findOne({
+        email: email_addresses[0].email_address,
+      });
+
+      if (userAlreadyExist) {
+        // Send a response indicating that the user already exists
+        return res.status(400).json({
+          success: false,
+          message: "User already exists",
+        });
+      }
+
+      // Create a new user
       const user = {
         clerkId: id,
         email: email_addresses[0].email_address,
@@ -171,17 +186,23 @@ usersRouter.post(
         photo: image_url,
       };
 
-      const newUser = await User.create(user);
-
-      if (newUser) {
+      try {
+        const newUser = await User.create(user);
         await clerkClient.users.updateUserMetadata(id, {
           publicMetadata: {
             userId: newUser._id,
           },
         });
-        return res.status(200).json({ success: true, message: "OK" });
+        return res
+          .status(200)
+          .json({ success: true, message: "User created successfully" });
+      } catch (error) {
+        // Handle any errors that occur during user creation
+        console.error("Error creating user:", error);
+        return res
+          .status(500)
+          .json({ success: false, message: "Error creating user" });
       }
-      //I experienced an issue where i sent to responses to the clerkwebhook causing an error and making the User.create to run twice make to instances of the same user in the the mongodb database that is also cause i didn't return the first response
     }
 
     if (eventType === "user.updated") {

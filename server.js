@@ -28,13 +28,13 @@ app.use(express.json());
 //Option 1: Allow all origins with default oof cors(*)
 // app.use(cors());
 //Option 2: Allow custom origins
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["content-type"],
-  })
-);
+const corsOptions = {
+  origin: ["http://localhost:3000", "https://snapgramapp.vercel.app"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type"],
+};
+
+app.use(cors(corsOptions));
 
 app.use("/users", usersRouter);
 //Connect to MongoDB
