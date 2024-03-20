@@ -179,10 +179,9 @@ usersRouter.post(
             userId: newUser._id,
           },
         });
-        return res
-          .status(200)
-          .json({ success: true, message: "OK", user: newUser });
+        return res.status(200).json({ success: true, message: "OK" });
       }
+      //I experienced an issue where i sent to responses to the clerkwebhook causing an error and making the User.create to run twice make to instances of the same user in the the mongodb database
     }
   }
 );
