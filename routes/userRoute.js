@@ -111,7 +111,7 @@ usersRouter.post(
     console.log(WEBHOOK_SECRET);
     // Grab the headers and body
     const headers = req.headers;
-    const payload = JSON.stringify(req.body);
+    const payload = JSON.stringify(req.body.json());
 
     // Get the Svix headers for verification
     const svix_id = headers["svix-id"];
