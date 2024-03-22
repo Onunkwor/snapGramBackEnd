@@ -33,8 +33,8 @@ usersRouter.post("/", async (req, res) => {
 //Get all Users from Database
 usersRouter.get("/", async (req, res) => {
   try {
-    const { limit, page = 0 } = req.query;
-    const userIdToSkip = new mongoose.ObjectId(page);
+    const { limit, pageParam = 0 } = req.query;
+    const userIdToSkip = new mongoose.ObjectId(pageParam);
     const users = await User.find({}).limit(parseInt(limit)).skip(userIdToSkip);
     return res.status(200).send(users);
   } catch (error) {
