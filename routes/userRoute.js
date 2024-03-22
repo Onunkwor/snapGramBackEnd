@@ -33,9 +33,9 @@ usersRouter.post("/", async (req, res) => {
 //Get all Users from Database
 usersRouter.get("/", async (req, res) => {
   try {
-    const { limit, pageParam } = req.query;
-    console.log({ pageParam });
-    const users = await User.find({}).limit(parseInt(limit)).skip(pageParam);
+    const { limit, cursor } = req.query;
+    console.log({ cursor });
+    const users = await User.find({}).limit(parseInt(limit)).skip(cursor);
     return res.status(200).send(users);
   } catch (error) {
     console.log("Error getting users", error);
