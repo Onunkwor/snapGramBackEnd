@@ -34,6 +34,7 @@ usersRouter.post("/", async (req, res) => {
 usersRouter.get("/", async (req, res) => {
   try {
     const { limit, pageParam = 0 } = req.query;
+    console.log({ pageParam });
     const users = await User.find({}).limit(parseInt(limit)).skip(pageParam);
     return res.status(200).send(users);
   } catch (error) {
