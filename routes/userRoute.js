@@ -4,6 +4,7 @@ import { Webhook } from "svix";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import clerkClient from "@clerk/clerk-sdk-node";
+import mongoose from "mongoose";
 dotenv.config();
 const usersRouter = express.Router();
 //Save User To Database
