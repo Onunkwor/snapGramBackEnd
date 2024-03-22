@@ -34,8 +34,8 @@ usersRouter.post("/", async (req, res) => {
 usersRouter.get("/", async (req, res) => {
   try {
     const { limit, page = 0 } = req.query;
-    const skip = page === 0 ? page : (parseInt(page) - 1) * parseInt(limit);
-    const users = await User.find({}).limit(parseInt(limit)).skip(skip);
+    const userIdToSkip = new mongoose.ObjectId(page);
+    const users = await User.find({}).limit(parseInt(limit)).skip(userIdToSkip);
     return res.status(200).send(users);
   } catch (error) {
     console.log("Error getting users", error);
