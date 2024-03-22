@@ -4,7 +4,6 @@ import { Webhook } from "svix";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import clerkClient from "@clerk/clerk-sdk-node";
-import mongoose from "mongoose";
 dotenv.config();
 const usersRouter = express.Router();
 //Save User To Database
@@ -35,8 +34,7 @@ usersRouter.post("/", async (req, res) => {
 usersRouter.get("/", async (req, res) => {
   try {
     const { limit, pageParam = 0 } = req.query;
-    const userIdToSkip = new mongoose.ObjectId(pageParam);
-    const users = await User.find({}).limit(parseInt(limit)).skip(userIdToSkip);
+    const users = await User.find({}).limit(parseInt(limit)).skip(pageParam);
     return res.status(200).send(users);
   } catch (error) {
     console.log("Error getting users", error);
