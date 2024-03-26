@@ -4,6 +4,7 @@ import { Webhook } from "svix";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import clerkClient from "@clerk/clerk-sdk-node";
+import mongoose from "mongoose";
 dotenv.config();
 const usersRouter = express.Router();
 //Save User To Database
@@ -34,9 +35,6 @@ usersRouter.post("/", async (req, res) => {
 usersRouter.get("/", async (req, res) => {
   try {
     const { cursor } = req.query;
-    const url = req.originalUrl;
-    // const { limit, pageParam } = req.query;
-    console.log({ cursor });
     const users = await User.find({}).limit(6).skip(cursor);
     return res.status(200).send(users);
   } catch (error) {
@@ -49,7 +47,7 @@ usersRouter.get("/", async (req, res) => {
 usersRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id);
+    const user = await User.find({ clerkId: id });
     return res.status(200).send(user);
   } catch (error) {
     console.log("Error getting users", error);
@@ -187,6 +185,9 @@ usersRouter.post(
         firstName: first_name,
         lastName: last_name,
         photo: image_url,
+        save: [],
+        followers: [],
+        following: [],
       };
 
       try {
@@ -218,14 +219,19 @@ usersRouter.post(
         photo: image_url,
       };
 
-      const updatedUser = await User.findOneAndUpdate(id, user, { new: true });
+      const updatedUser = await User.findOneAndUpdate({ clerkId: id }, user, {
+        new: true,
+      });
       return res.status(200).json({ message: "OK", user: updatedUser });
     }
     if (eventType === "user.deleted") {
       const { id } = evt.data;
 
-      const userToDelete = await User.findOne(id);
+      const userToDelete = await User.findOne({ clerkId: id });
       const deleteUser = await User.findOneAndDelete(userToDelete._id);
+      const deleteUserPost = await Post.findOneAndDelete({
+        creator: userToDelete,
+      });
       return res.status(200).json({ message: "OK" });
     }
   }

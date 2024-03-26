@@ -3,6 +3,9 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import usersRouter from "./routes/userRoute.js";
 import cors from "cors";
+import postsRouter from "./routes/postRoute.js";
+import commentsRouter from "./routes/comment.Route.js";
+import savedRouter from "./routes/savedRoute.js";
 
 //Get .env variables
 dotenv.config();
@@ -37,6 +40,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use("/users", usersRouter);
+app.use("/posts", postsRouter);
+app.use("/comments", commentsRouter);
+app.use("/saves", savedRouter);
 //Connect to MongoDB
 mongoose
   .connect(MONGODB_URI, { dbName: "snapGram" })

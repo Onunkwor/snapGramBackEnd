@@ -25,6 +25,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  save: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  following: [{ type: String }],
+  followers: [{ type: String }],
 });
 
 export const User = mongoose.models.User || mongoose.model("User", userSchema);
