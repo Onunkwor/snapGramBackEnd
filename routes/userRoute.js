@@ -185,7 +185,7 @@ usersRouter.post(
         firstName: first_name,
         lastName: last_name,
         photo: image_url,
-        save: [],
+        saved: [],
         followers: [],
         following: [],
       };
