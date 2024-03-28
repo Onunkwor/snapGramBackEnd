@@ -32,7 +32,7 @@ app.use(express.json());
 // app.use(cors());
 //Option 2: Allow custom origins
 const corsOptions = {
-  origin: ["https://snapgramapp.vercel.app"],
+  origin: "https://snapgramapp.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type"],
 };
