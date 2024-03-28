@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import clerkClient from "@clerk/clerk-sdk-node";
 import mongoose from "mongoose";
+import { Post } from "../models/postModel.js";
 dotenv.config();
 const usersRouter = express.Router();
 //Save User To Database
@@ -44,10 +45,20 @@ usersRouter.get("/", async (req, res) => {
 });
 
 //Get a User from Database
-usersRouter.get("/:id", async (req, res) => {
+usersRouter.get("/clerk/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.find({ clerkId: id });
+    return res.status(200).send(user);
+  } catch (error) {
+    console.log("Error getting users", error);
+    return res.status(500).send({ message: error.message });
+  }
+});
+usersRouter.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
     return res.status(200).send(user);
   } catch (error) {
     console.log("Error getting users", error);
@@ -71,28 +82,6 @@ usersRouter.put("/:id", async (req, res) => {
       });
     }
     return res.status(200).send({ message: "User Updated" });
-  } catch (error) {
-    console.log("Error getting users", error);
-    return res.status(500).send({ message: error.message });
-  }
-});
-
-//Delete User
-usersRouter.delete("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!id) {
-      return res.status(400).send({
-        message: "Pass a valid Id",
-      });
-    }
-    const result = await User.findByIdAndDelete(id);
-    if (!result) {
-      return res.status(404).send({
-        message: "User not found",
-      });
-    }
-    return res.status(200).send({ message: "User Deleted" });
   } catch (error) {
     console.log("Error getting users", error);
     return res.status(500).send({ message: error.message });
@@ -230,11 +219,63 @@ usersRouter.post(
       const userToDelete = await User.findOne({ clerkId: id });
       const deleteUser = await User.findOneAndDelete(userToDelete._id);
       const deleteUserPost = await Post.findOneAndDelete({
-        creator: userToDelete,
+        creator: userToDelete._id,
       });
       return res.status(200).json({ message: "OK" });
     }
   }
 );
+
+usersRouter.patch("/follow", async (req, res) => {
+  try {
+    const { followingRecord, followersRecord } = req.body;
+
+    // Fetch the current user and the user to follow
+    const currentUser = await User.findById(followersRecord);
+    const userToFollow = await User.findById(followingRecord);
+
+    // Update the following list of the current user
+    await User.findByIdAndUpdate(currentUser._id, {
+      following: [...currentUser.following, userToFollow._id],
+    });
+
+    // Update the followers list of the user to follow
+    await User.findByIdAndUpdate(userToFollow._id, {
+      followers: [...userToFollow.followers, currentUser._id],
+    });
+
+    // Send a success response to the client
+    return res.status(200).send({ message: "Successfully followed user." });
+  } catch (error) {
+    console.log("Error following user:", error);
+    return res.status(500).send({ message: "Internal server error." });
+  }
+});
+usersRouter.patch("/unFollow", async (req, res) => {
+  try {
+    const { currentUser, user, followingRecordList, followerRecordList } =
+      req.body;
+
+    // Fetch the current user and the user to follow
+    const logInUser = await User.findById(currentUser);
+    const userToUnFollow = await User.findById(user);
+
+    // Update the following list of the current user
+    await User.findByIdAndUpdate(logInUser._id, {
+      following: followingRecordList,
+    });
+
+    // Update the followers list of the user to follow
+    await User.findByIdAndUpdate(userToUnFollow._id, {
+      followers: followerRecordList,
+    });
+
+    // Send a success response to the client
+    return res.status(200).send({ message: "Successfully UnFollowed user." });
+  } catch (error) {
+    console.log("Error unFollowing user:", error);
+    return res.status(500).send({ message: "Internal server error." });
+  }
+});
 
 export default usersRouter;

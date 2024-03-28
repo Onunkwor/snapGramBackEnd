@@ -10,7 +10,7 @@ const savedSchema = new mongoose.Schema({
     ref: "Post",
   },
   createdAt: {
-    type: String,
+    type: Number,
     required: true,
   },
 });

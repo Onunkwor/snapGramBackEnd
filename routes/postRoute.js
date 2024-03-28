@@ -55,6 +55,18 @@ postsRouter.get("/", async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 });
+postsRouter.get("/allPosts", async (req, res) => {
+  try {
+    const posts = await Post.find({}).sort({ createdAt: -1 }).populate({
+      path: "creator",
+      model: User,
+    });
+    return res.status(200).send(posts);
+  } catch (error) {
+    console.log("Error fetching post from MongoDB", error);
+    res.status(500).send({ message: error.message });
+  }
+});
 
 postsRouter.get("/post/:id", async (req, res) => {
   try {
@@ -112,14 +124,13 @@ postsRouter.patch("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { caption, imageUrl, location, tags } = req.body;
-    const postObjectId = mongoose.Types.ObjectId(id);
     const updatePost = {
       caption,
       imageUrl,
       location,
       tags,
     };
-    const fetchData = await Post.findByIdAndUpdate(postObjectId, updatePost, {
+    const fetchData = await Post.findByIdAndUpdate(id, updatePost, {
       new: true,
     });
     return res.status(200).send(fetchData);
@@ -128,5 +139,53 @@ postsRouter.patch("/:id", async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 });
-
+postsRouter.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await Post.findByIdAndDelete(id);
+    return res.status(202);
+  } catch (error) {
+    console.log("Error deleting post from mongodb", error);
+    res.status(500).send({ message: error.message });
+  }
+});
+postsRouter.get("/searchPost", async (req, res) => {
+  try {
+    const { query } = req.query;
+    const posts = await Post.find({
+      $or: [
+        { caption: { $regex: query, $options: "i" } }, // Search in the caption
+        { tags: { $regex: query, $options: "i" } }, // Search in the tags
+      ],
+    })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "creator",
+        model: User,
+      });
+    return res.status(200).send(posts);
+  } catch (error) {
+    console.log("Error searching for post from MongoDB", error);
+    res.status(500).send({ message: error.message });
+  }
+});
+postsRouter.patch("/updatePost/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { caption, imageUrl, location, tags } = req.body;
+    const updatePost = {
+      caption,
+      imageUrl,
+      location,
+      tags,
+    };
+    const fetchData = await Post.findByIdAndUpdate(id, updatePost, {
+      new: true,
+    });
+    return res.status(200).send(fetchData);
+  } catch (error) {
+    console.log("Error updating post:", error);
+    res.status(500).send({ message: error.message });
+  }
+});
 export default postsRouter;

@@ -2,7 +2,6 @@ import express from "express";
 import { Comment } from "../models/commentModel.js";
 import { User } from "../models/userModel.js";
 import { Post } from "../models/postModel.js";
-import mongoose from "mongoose";
 const commentsRouter = express.Router();
 
 commentsRouter.post("/", async (req, res) => {
@@ -26,17 +25,18 @@ commentsRouter.post("/", async (req, res) => {
       createdAt: req.body.createdAt,
     };
     const comment = await Comment.create(newComment);
-    // const postObjectId = await mongoose.Types.ObjectId(postId);
-    const addCommentToPost = await Post.findByIdAndUpdate(postId, {
-      comments: [comment._id],
-    });
+    const findPost = await Post.findById(postId);
+    const addCommentToPost = await Post.findByIdAndUpdate(
+      postId,
+      { comments: [...findPost.comments, comment._id] }, // Append the new comment ID to the comments array
+      { new: true }
+    );
     return res.status(201).send(comment);
   } catch (error) {
     console.log("Error adding comment to mongo db", error);
     res.status(500).send({ message: error.message });
   }
 });
-
 commentsRouter.get("/", async (req, res) => {
   try {
     const { postId } = req.body;
@@ -56,24 +56,31 @@ commentsRouter.patch("/:commentId", async (req, res) => {
   try {
     const { likes } = req.body;
     const { commentId } = req.params;
-
-    // Convert the provided commentId string into a MongoDB ObjectId
-    const commentObjectId = mongoose.Types.ObjectId(commentId);
-
     // Find the comment by its ObjectId and update its likes array
     const updatedComment = await Comment.findByIdAndUpdate(
-      commentObjectId,
-      { $addToSet: { likes: { $each: likes } } },
+      commentId,
+      { likes: [likes] },
       { new: true }
     );
-
+    const findPost = await Post.findOne({ comments: commentId });
     if (!updatedComment) {
       return res.status(404).send({ message: "Comment not found" });
     }
 
-    return res.status(200).send(updatedComment);
+    return res.status(200).send(findPost);
   } catch (error) {
     console.log("Error updating comment:", error);
+    res.status(500).send({ message: "Internal server error" });
+  }
+});
+
+commentsRouter.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await Comment.findByIdAndDelete(id);
+    return res.status(202);
+  } catch (error) {
+    console.log("Error deleting comment:", error);
     res.status(500).send({ message: "Internal server error" });
   }
 });
