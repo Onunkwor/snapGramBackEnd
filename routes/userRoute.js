@@ -192,12 +192,25 @@ usersRouter.post(
     if (eventType === "user.deleted") {
       const { id } = evt.data;
 
+      // Find the user by clerkId
       const userToDelete = await User.findOne({ clerkId: id });
-      const deleteUser = await User.findOneAndDelete(userToDelete._id);
-      const deleteUserPost = await Post.findOneAndDelete({
+
+      // Check if userToDelete exists
+      if (!userToDelete) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Delete the user
+      const deleteUser = await User.findOneAndDelete({ clerkId: id });
+
+      // Delete any associated posts
+      const deleteUserPost = await Post.deleteMany({
         creator: userToDelete._id,
       });
-      return res.status(200).json({ message: "OK" });
+
+      return res
+        .status(200)
+        .json({ message: "User and associated posts deleted successfully" });
     }
   }
 );
