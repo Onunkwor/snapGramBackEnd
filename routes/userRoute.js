@@ -497,13 +497,15 @@ usersRouter.post(
         photo: image_url,
       };
 
-      const updatedUser = await User.findOneAndUpdate(id, user, { new: true });
+      const updatedUser = await User.findOneAndUpdate({ clerkId: id }, user, {
+        new: true,
+      });
       return res.status(200).json({ message: "OK", user: updatedUser });
     }
     if (eventType === "user.deleted") {
       const { id } = evt.data;
 
-      const userToDelete = await User.findOne(id);
+      const userToDelete = await User.findOne({ clerkId: id });
       const deleteUser = await User.findOneAndDelete(userToDelete._id);
       return res.status(200).json({ message: "OK" });
     }
