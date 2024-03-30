@@ -146,7 +146,7 @@ usersRouter.post(
       const user = {
         clerkId: id,
         email: email_addresses[0].email_address,
-        username: username,
+        username: username || first_name,
         firstName: first_name,
         lastName: last_name || first_name,
         photo: image_url,
@@ -180,7 +180,7 @@ usersRouter.post(
       const user = {
         firstName: first_name,
         lastName: last_name || first_name,
-        username: username,
+        username: username || first_name,
         photo: image_url,
       };
 
