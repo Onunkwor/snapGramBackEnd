@@ -139,6 +139,7 @@ postsRouter.patch("/:id", async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 });
+
 postsRouter.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
