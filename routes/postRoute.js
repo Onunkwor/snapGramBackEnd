@@ -43,7 +43,7 @@ postsRouter.get("/", async (req, res) => {
     const { cursor } = req.query;
     const posts = await Post.find({})
       .sort({ createdAt: -1 }) // Sort by createdAt field in descending order
-      .limit(10)
+      .limit(13)
       .skip(cursor)
       .populate({
         path: "creator",
