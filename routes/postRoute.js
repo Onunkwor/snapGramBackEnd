@@ -39,7 +39,7 @@ postsRouter.post("/", requireAuth, async (req, res) => {
   }
 });
 
-postsRouter.get("/", requireAuth, async (req, res) => {
+postsRouter.get("/", async (req, res) => {
   try {
     const { cursor } = req.query;
     const posts = await Post.find({})

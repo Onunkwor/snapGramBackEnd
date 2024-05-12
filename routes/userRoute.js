@@ -22,7 +22,7 @@ usersRouter.get("/", async (req, res) => {
 });
 
 //Get a User from Database
-usersRouter.get("/clerk/:id", requireAuth, async (req, res) => {
+usersRouter.get("/clerk/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.find({ clerkId: id });
