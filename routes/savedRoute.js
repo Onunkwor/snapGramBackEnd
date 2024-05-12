@@ -2,9 +2,10 @@ import express from "express";
 import { Saved } from "../models/savedModel.js";
 import { Post } from "../models/postModel.js";
 import { User } from "../models/userModel.js";
+import { requireAuth } from "../MiddleWare/middleware.js";
 const savedRouter = express.Router();
 
-savedRouter.post("/", async (req, res) => {
+savedRouter.post("/", requireAuth, async (req, res) => {
   try {
     const { postId, user, createdAt } = req.body;
     if (!req.body.postId || !req.body.user || !req.body.createdAt) {
@@ -35,7 +36,7 @@ savedRouter.post("/", async (req, res) => {
   }
 });
 
-savedRouter.get("/:id", async (req, res) => {
+savedRouter.get("/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const fetchData = await Saved.find({ userId: id });
@@ -49,7 +50,7 @@ savedRouter.get("/:id", async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 });
-savedRouter.delete("/:id", async (req, res) => {
+savedRouter.delete("/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const fetchData = await Saved.findByIdAndDelete(id);

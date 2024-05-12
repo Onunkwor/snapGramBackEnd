@@ -10,7 +10,7 @@ import savedRouter from "./routes/savedRoute.js";
 //Get .env variables
 dotenv.config();
 const MONGODB_URI = process.env.MONGODB_URI;
-console.log(MONGODB_URI);
+// console.log(MONGODB_URI);
 
 //Initialize app
 const app = express();
@@ -34,7 +34,7 @@ app.use(express.json());
 const corsOptions = {
   origin: ["https://snapgramapp.vercel.app", "http://localhost:3000"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  allowedHeaders: ["Content-Type"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));

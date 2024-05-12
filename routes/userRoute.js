@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import clerkClient from "@clerk/clerk-sdk-node";
 import { Post } from "../models/postModel.js";
+import { requireAuth } from "../MiddleWare/middleware.js";
 dotenv.config();
 const usersRouter = express.Router();
 
@@ -21,7 +22,7 @@ usersRouter.get("/", async (req, res) => {
 });
 
 //Get a User from Database
-usersRouter.get("/clerk/:id", async (req, res) => {
+usersRouter.get("/clerk/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.find({ clerkId: id });
@@ -31,7 +32,7 @@ usersRouter.get("/clerk/:id", async (req, res) => {
     return res.status(500).send({ message: error.message });
   }
 });
-usersRouter.get("/:id", async (req, res) => {
+usersRouter.get("/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
@@ -43,7 +44,7 @@ usersRouter.get("/:id", async (req, res) => {
 });
 
 //Update User
-usersRouter.put("/:id", async (req, res) => {
+usersRouter.put("/:id", requireAuth, async (req, res) => {
   try {
     if (!req.body.username || !req.body.email || !req.body.name) {
       return res.status(400).send({

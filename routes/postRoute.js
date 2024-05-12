@@ -3,10 +3,11 @@ import { Post } from "../models/postModel.js";
 import { User } from "../models/userModel.js";
 import { Comment } from "../models/commentModel.js";
 import { Saved } from "../models/savedModel.js";
-import mongoose from "mongoose";
+import { requireAuth } from "../MiddleWare/middleware.js";
+
 const postsRouter = express.Router();
 
-postsRouter.post("/", async (req, res) => {
+postsRouter.post("/", requireAuth, async (req, res) => {
   try {
     if (
       !req.body.creator ||
@@ -38,7 +39,7 @@ postsRouter.post("/", async (req, res) => {
   }
 });
 
-postsRouter.get("/", async (req, res) => {
+postsRouter.get("/", requireAuth, async (req, res) => {
   try {
     const { cursor } = req.query;
     const posts = await Post.find({})
@@ -55,7 +56,7 @@ postsRouter.get("/", async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 });
-postsRouter.get("/allPosts", async (req, res) => {
+postsRouter.get("/allPosts", requireAuth, async (req, res) => {
   try {
     const posts = await Post.find({}).sort({ createdAt: -1 }).populate({
       path: "creator",
@@ -68,7 +69,7 @@ postsRouter.get("/allPosts", async (req, res) => {
   }
 });
 
-postsRouter.get("/post/:id", async (req, res) => {
+postsRouter.get("/post/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const fetchData = await Post.findById(id)
@@ -103,7 +104,7 @@ postsRouter.get("/post/:id", async (req, res) => {
   }
 });
 
-postsRouter.patch("/likes/:id", async (req, res) => {
+postsRouter.patch("/likes/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { likes } = req.body;
@@ -120,7 +121,7 @@ postsRouter.patch("/likes/:id", async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 });
-postsRouter.patch("/:id", async (req, res) => {
+postsRouter.patch("/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { caption, imageUrl, location, tags } = req.body;
@@ -140,7 +141,7 @@ postsRouter.patch("/:id", async (req, res) => {
   }
 });
 
-postsRouter.delete("/:id", async (req, res) => {
+postsRouter.delete("/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const response = await Post.findByIdAndDelete(id);
@@ -150,7 +151,7 @@ postsRouter.delete("/:id", async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 });
-postsRouter.get("/searchPost", async (req, res) => {
+postsRouter.get("/searchPost", requireAuth, async (req, res) => {
   try {
     const { query } = req.query;
     const posts = await Post.find({
@@ -170,7 +171,7 @@ postsRouter.get("/searchPost", async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 });
-postsRouter.patch("/updatePost/:id", async (req, res) => {
+postsRouter.patch("/updatePost/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { caption, imageUrl, location, tags } = req.body;

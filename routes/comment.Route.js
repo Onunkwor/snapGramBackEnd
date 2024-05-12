@@ -2,9 +2,10 @@ import express from "express";
 import { Comment } from "../models/commentModel.js";
 import { User } from "../models/userModel.js";
 import { Post } from "../models/postModel.js";
+import { requireAuth } from "../MiddleWare/middleware.js";
 const commentsRouter = express.Router();
 
-commentsRouter.post("/", async (req, res) => {
+commentsRouter.post("/", requireAuth, async (req, res) => {
   try {
     if (
       !req.body.user ||
@@ -37,7 +38,7 @@ commentsRouter.post("/", async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 });
-commentsRouter.get("/", async (req, res) => {
+commentsRouter.get("/", requireAuth, async (req, res) => {
   try {
     const { postId } = req.body;
     const fetchData = await Comment.find({ postId: postId });
@@ -52,7 +53,7 @@ commentsRouter.get("/", async (req, res) => {
   }
 });
 
-commentsRouter.patch("/:commentId", async (req, res) => {
+commentsRouter.patch("/:commentId", requireAuth, async (req, res) => {
   try {
     const { likes } = req.body;
     const { commentId } = req.params;
@@ -74,7 +75,7 @@ commentsRouter.patch("/:commentId", async (req, res) => {
   }
 });
 
-commentsRouter.delete("/:id", async (req, res) => {
+commentsRouter.delete("/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const response = await Comment.findByIdAndDelete(id);
