@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import { Post } from "../models/postModel.js";
 import { User } from "../models/userModel.js";
 import { Comment } from "../models/commentModel.js";
@@ -9,6 +9,7 @@ const postsRouter = express.Router();
 
 postsRouter.post("/", requireAuth, async (req, res) => {
   try {
+    const { sessionClaims } = req.auth;
     if (
       !req.body.creator ||
       !req.body.caption ||
@@ -20,8 +21,9 @@ postsRouter.post("/", requireAuth, async (req, res) => {
         message: "Send all required fields: creator, caption, file, tags",
       });
     }
+    const user = await User.findOne({ clerkId: sessionClaims.sub });
     const newPost = {
-      creator: req.body.creator,
+      creator: user._id,
       caption: req.body.caption,
       imageUrl: req.body.imageUrl,
       location: req.body.location,
@@ -144,6 +146,11 @@ postsRouter.patch("/:id", requireAuth, async (req, res) => {
 postsRouter.delete("/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
+    const { sessionClaims } = req.auth;
+    const post = await Post.findById(id).populate("creator");
+    if (post.creator.clerkId !== sessionClaims.sub) {
+      return res.status(401).send({ message: "Unauthorized" });
+    }
     const response = await Post.findByIdAndDelete(id);
     return res.status(202);
   } catch (error) {
@@ -174,6 +181,11 @@ postsRouter.get("/searchPost", requireAuth, async (req, res) => {
 postsRouter.patch("/updatePost/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
+    const { sessionClaims } = req.auth;
+    const post = await Post.findById(id).populate("creator");
+    if (post.creator.clerkId !== sessionClaims.sub) {
+      return res.status(401).send({ message: "Unauthorized" });
+    }
     const { caption, imageUrl, location, tags } = req.body;
     const updatePost = {
       caption,
